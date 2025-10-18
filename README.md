@@ -19,4 +19,5 @@ View your app in AI Studio: https://ai.studio/apps/temp/1
 3. Run the app:
    `npm run dev`
 
-4. 
+4. Create an `.env.local` file and copy the contents of `.env` into it. Replace the placeholders with the actual information. **Do not commit `.env.local`**
+
