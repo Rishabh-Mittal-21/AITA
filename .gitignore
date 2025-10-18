@@ -23,5 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# lol api keys 
+# 67 67 67 67 67 67
 .env.local
+package-lock.json
