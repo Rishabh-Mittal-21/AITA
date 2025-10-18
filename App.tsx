@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import Toolbar from './components/Toolbar';
-import CodePanel from './components/CodePanel';
-import ReviewPanel from './components/ReviewPanel';
-import { getCodeReview } from './services/geminiService';
+import Toolbar from './components/Toolbar.tsx';
+import CodePanel from './components/CodePanel.tsx';
+import ReviewPanel from './components/ReviewPanel.tsx';
+import { getCodeReview } from './services/geminiService.ts';
 import type { Persona, ReviewChunk } from './types';
 import { PERSONAS, DEFAULT_CODE } from './constants';
 
