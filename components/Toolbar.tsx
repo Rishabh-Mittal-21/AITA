@@ -37,69 +37,71 @@ const Toolbar: React.FC<ToolbarProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-between p-2 border-b border-shark bg-bunker">
-      <div className="flex items-center gap-4">
-        <h1 className="text-xl font-bold text-white">
-          Code<span className="text-science-blue">Whisperer</span>
-        </h1>
-        <div className="relative">
-          <selectedPersona.avatar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-storm-gray" />
-          <select
-            value={selectedPersona.id}
-            onChange={handleSelectChange}
-            className="pl-10 pr-4 py-2 text-sm rounded-md bg-shark border border-storm-gray/50 focus:ring-2 focus:ring-science-blue focus:outline-none appearance-none"
-          >
-            {PERSONAS.map(p => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
+    <div className="border-b border-shark bg-bunker">
+      <div className="flex items-center justify-between py-2 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl font-bold text-white">
+            Code<span className="text-science-blue">Whisperer</span>
+          </h1>
         </div>
-      </div>
-      <div className="flex items-center gap-2">
-         {isSpeaking ? (
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <selectedPersona.avatar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-storm-gray" />
+            <select
+              value={selectedPersona.id}
+              onChange={handleSelectChange}
+              className="pl-10 pr-4 py-2 text-sm rounded-md bg-shark border border-storm-gray/50 focus:ring-2 focus:ring-science-blue focus:outline-none appearance-none"
+            >
+              {PERSONAS.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          </div>
+           {isSpeaking ? (
+            <button
+              onClick={onStopSpeaking}
+              className="px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              <StopIcon />
+              Stop Speaking
+            </button>
+           ) : (
+            <button
+              onClick={onSpeak}
+              disabled={!hasReview || isReviewing}
+              className="px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-shark hover:bg-storm-gray/20 border border-storm-gray/50"
+            >
+              <SpeakerIcon />
+              Speak
+            </button>
+           )}
           <button
-            onClick={onStopSpeaking}
-            className="px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors bg-amber-600 hover:bg-amber-700 text-white"
-          >
-            <StopIcon />
-            Stop Speaking
-          </button>
-         ) : (
-          <button
-            onClick={onSpeak}
-            disabled={!hasReview || isReviewing}
+            onClick={onUndo}
+            disabled={!canUndo || isReviewing}
             className="px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-shark hover:bg-storm-gray/20 border border-storm-gray/50"
           >
-            <SpeakerIcon />
-            Speak
+            <UndoIcon />
+            Undo
           </button>
-         )}
-        <button
-          onClick={onUndo}
-          disabled={!canUndo || isReviewing}
-          className="px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-shark hover:bg-storm-gray/20 border border-storm-gray/50"
-        >
-          <UndoIcon />
-          Undo
-        </button>
-        {isReviewing ? (
-           <button
-            onClick={onStop}
-            className="px-4 py-2 text-sm font-semibold text-white rounded-md flex items-center gap-2 transition-colors bg-red-600 hover:bg-red-700"
-          >
-            <SpinnerIcon />
-            Stop
-          </button>
-        ) : (
-          <button
-            onClick={onReview}
-            disabled={isReviewing}
-            className="px-4 py-2 text-sm font-semibold text-white rounded-md flex items-center gap-2 transition-colors bg-science-blue hover:bg-blue-700 disabled:bg-blue-900 disabled:text-gray-400 disabled:cursor-wait"
-          >
-            <ReviewIcon />
-            Review Code
-          </button>
-        )}
+          {isReviewing ? (
+             <button
+              onClick={onStop}
+              className="px-4 py-2 text-sm font-semibold text-white rounded-md flex items-center gap-2 transition-colors bg-red-600 hover:bg-red-700"
+            >
+              <SpinnerIcon />
+              Stop
+            </button>
+          ) : (
+            <button
+              onClick={onReview}
+              disabled={isReviewing}
+              className="px-4 py-2 text-sm font-semibold text-white rounded-md flex items-center gap-2 transition-colors bg-science-blue hover:bg-blue-700 disabled:bg-blue-900 disabled:text-gray-400 disabled:cursor-wait"
+            >
+              <ReviewIcon />
+              Review Code
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

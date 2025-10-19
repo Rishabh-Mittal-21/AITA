@@ -44,9 +44,10 @@ const CodePanel: React.FC<CodePanelProps> = ({ code, onCodeChange, highlightLine
 
   return (
     <div className="flex-1 flex flex-col bg-bunker font-mono text-sm relative">
-      <div className="flex items-center justify-between p-2 border-b border-shark text-storm-gray">
-        <span>Code Editor</span>
-        <div className="flex items-center gap-2">
+      <div className="border-b border-shark text-storm-gray">
+        <div className="flex items-center justify-between py-2 px-4 sm:px-6 lg:px-8">
+          <span>Code Editor</span>
+          <div className="flex items-center gap-2">
           <span className="text-xs">Language:</span>
           <select
             value={selectedLanguage}
@@ -59,6 +60,7 @@ const CodePanel: React.FC<CodePanelProps> = ({ code, onCodeChange, highlightLine
           </select>
         </div>
       </div>
+    </div>
       <div className="flex flex-1 overflow-hidden">
           <div ref={lineNumbersRef} className="text-right pr-4 text-storm-gray select-none p-2 font-mono text-sm leading-relaxed overflow-hidden">
             {lines.map((_, i) => (
