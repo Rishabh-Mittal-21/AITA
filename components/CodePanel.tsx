@@ -72,11 +72,11 @@ const CodePanel: React.FC<CodePanelProps> = ({ code, onCodeChange, highlightLine
               onChange={(e) => onCodeChange(e.target.value)}
               onScroll={handleScroll}
               spellCheck="false"
-              className="absolute inset-0 w-full h-full bg-transparent resize-none focus:outline-none p-2 font-mono text-sm leading-relaxed text-transparent caret-loblolly overflow-auto"
+              className="absolute inset-0 w-full h-full bg-transparent resize-none focus:outline-none p-2 font-mono text-sm leading-relaxed text-transparent caret-loblolly overflow-auto custom-scrollbar scrollbar-inset"
             />
             <pre
               ref={displayRef}
-              className="absolute inset-0 w-full h-full p-2 font-mono text-sm leading-relaxed select-text pointer-events-none overflow-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="absolute inset-0 w-full h-full p-2 font-mono text-sm leading-relaxed select-text pointer-events-none overflow-auto custom-scrollbar scrollbar-inset"
               aria-hidden="true"
            >
             <code>

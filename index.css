@@ -1,0 +1,53 @@
+:root{
+  /*
+    Scrollbar variables - tweak these to change the look:
+    --scrollbar-bg: track color when visible (usually subtle)
+    --scrollbar-thumb: thumb color
+    --scrollbar-thumb-hover: thumb color on hover
+    --scrollbar-width: thickness of scrollbar (px)
+  */
+  --scrollbar-bg: rgba(255,255,255,0.03);
+  --scrollbar-thumb: rgba(255,255,255,0.08);
+  --scrollbar-thumb-hover: rgba(255,255,255,0.16);
+  --scrollbar-width: 10px;
+}
+
+/* Modern custom scrollbar for webkit browsers */
+.custom-scrollbar::-webkit-scrollbar{
+  width: var(--scrollbar-width);
+  height: var(--scrollbar-width);
+}
+.custom-scrollbar::-webkit-scrollbar-track{
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb{
+  background-color: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent; /* creates padding effect */
+  background-clip: padding-box;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover{
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+/* Firefox */
+.custom-scrollbar{
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+/* Optional: show a faint track on hover for better discoverability */
+.custom-scrollbar:hover::-webkit-scrollbar-track{
+  background: var(--scrollbar-bg);
+}
+.custom-scrollbar:hover{
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+}
+
+/* Make the scrollbar slightly inset so it doesn't overlap content */
+.scrollbar-inset{
+  padding-right: 6px; /* visual inset — adjust if needed */
+}
+
+/* Utility for hiding the default Tailwind arbitrary rule used previously */
+.no-hide-scrollbar::-webkit-scrollbar{display:block}
