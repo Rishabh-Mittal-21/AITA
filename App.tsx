@@ -3,6 +3,7 @@ import Toolbar from './components/Toolbar';
 import CodePanel from './components/CodePanel';
 import ReviewPanel from './components/ReviewPanel';
 import { getCodeReview } from './services/geminiService';
+import { getElevenLabsAudio } from './services/elevenLabsService';
 import type { Persona, CodeReview, ReviewChunk } from './types';
 import { PERSONAS, DEFAULT_CODE, SUPPORTED_LANGUAGES } from './constants';
 
@@ -22,20 +23,23 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [highlightedLines, setHighlightedLines] = useState<{ start: number, end: number } | null>(null);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [codeHistory, setCodeHistory] = useState<CodeHistory[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string>(SUPPORTED_LANGUAGES[0]);
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const analysisCancelled = useRef(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
-
+  // Effect to handle cleanup when the component truly unmounts
   useEffect(() => {
-    const loadVoices = () => {
-        setVoices(window.speechSynthesis.getVoices());
-    };
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-    loadVoices(); // Initial load
     return () => {
-        window.speechSynthesis.onvoiceschanged = null;
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+      audioSourceRef.current?.stop();
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close();
+      }
     };
   }, []);
 
@@ -192,38 +196,71 @@ const App: React.FC = () => {
       });
   };
 
+  const handleStopSpeaking = useCallback(() => {
+    if (audioSourceRef.current) {
+        audioSourceRef.current.stop();
+        audioSourceRef.current.disconnect();
+        audioSourceRef.current = null;
+    }
+    if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+    }
+    setIsSpeaking(false);
+  }, []);
 
-  const handleSpeak = () => {
-    if (!('speechSynthesis' in window) || !codeReview) {
-        alert("Sorry, your browser doesn't support text-to-speech or there is no review to speak.");
-        return;
+  const handleSpeak = useCallback(async () => {
+    if (!codeReview) {
+      alert("There is no review to speak.");
+      return;
     }
     
     const activeFeedback = codeReview.feedback.filter(f => f.status === 'active');
+    if (activeFeedback.length === 0) return;
+
     const textToSpeak = (chunk: ReviewChunk) => {
         const lineRef = chunk.line_end ? `on lines ${chunk.line_start} to ${chunk.line_end}` : `on line ${chunk.line_start}`;
-        return `${lineRef}: ${chunk.explanation}`;
+        return `${chunk.issue_type} issue ${lineRef}: ${chunk.explanation}`;
     };
     const fullText = activeFeedback.map(textToSpeak).join('. ');
-    if (!fullText) return;
+    
+    handleStopSpeaking();
 
-    const utterance = new SpeechSynthesisUtterance(fullText);
-    
-    let selectedVoice: SpeechSynthesisVoice | undefined;
-    if (persona.id === 'professional') {
-        selectedVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('David')) || voices.find(v => v.lang.startsWith('en'));
-    } else if (persona.id === 'chill') {
-        selectedVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Zira')) || voices.find(v => v.lang.startsWith('en'));
-    } else if (persona.id === 'sarcastic') {
-        selectedVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Mark')) || voices.find(v => v.lang.startsWith('en'));
-        utterance.pitch = 0.8;
-        utterance.rate = 0.95;
+    if (!persona.elevenLabsVoiceId) {
+        setError("The selected persona does not have a configured voice ID for ElevenLabs.");
+        return;
     }
-    utterance.voice = selectedVoice || voices.find(v => v.lang.startsWith('en')) || null;
-    
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-  };
+
+    try {
+        setIsSpeaking(true);
+        const audioData = await getElevenLabsAudio(fullText, persona.elevenLabsVoiceId);
+        
+        // Lazily initialize AudioContext or create a new one if it was closed.
+        // This robustly handles React StrictMode's double-mount behavior.
+        if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+            audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        }
+        const ctx = audioContextRef.current;
+
+        if (ctx.state === 'suspended') {
+            await ctx.resume();
+        }
+
+        const audioBuffer = await ctx.decodeAudioData(audioData);
+        const source = ctx.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(ctx.destination);
+        source.onended = () => {
+            setIsSpeaking(false);
+            audioSourceRef.current = null;
+        };
+        source.start(0);
+        audioSourceRef.current = source;
+    } catch (e) {
+        if (e instanceof Error) setError(`Text-to-speech error: ${e.message}`);
+        else setError('An unknown text-to-speech error occurred.');
+        setIsSpeaking(false);
+    }
+  }, [codeReview, persona.elevenLabsVoiceId, handleStopSpeaking]);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-midnight">
@@ -234,8 +271,10 @@ const App: React.FC = () => {
         onSpeak={handleSpeak}
         onUndo={handleUndo}
         onStop={handleStop}
+        onStopSpeaking={handleStopSpeaking}
         canUndo={codeHistory.length > 0}
         isReviewing={isLoading}
+        isSpeaking={isSpeaking}
         hasReview={!!codeReview && codeReview.feedback.some(f => f.status === 'active')}
       />
       <main className="flex flex-1 overflow-hidden">

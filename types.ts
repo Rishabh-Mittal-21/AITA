@@ -2,10 +2,11 @@ import type React from 'react';
 
 export interface Persona {
   id: string;
-  name: string;
+  name:string;
   description: string;
   avatar: React.ComponentType<{ className?: string }>;
   prompt: string;
+  elevenLabsVoiceId?: string;
 }
 
 export interface ReviewChunk {

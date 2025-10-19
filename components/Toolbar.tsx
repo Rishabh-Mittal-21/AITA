@@ -9,8 +9,10 @@ interface ToolbarProps {
   onSpeak: () => void;
   onUndo: () => void;
   onStop: () => void;
+  onStopSpeaking: () => void;
   canUndo: boolean;
   isReviewing: boolean;
+  isSpeaking: boolean;
   hasReview: boolean;
 }
 
@@ -21,8 +23,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onSpeak,
   onUndo,
   onStop,
+  onStopSpeaking,
   canUndo,
   isReviewing,
+  isSpeaking,
   hasReview
 }) => {
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -52,14 +56,24 @@ const Toolbar: React.FC<ToolbarProps> = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
-         <button
-          onClick={onSpeak}
-          disabled={!hasReview || isReviewing}
-          className="px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-shark hover:bg-storm-gray/20 border border-storm-gray/50"
-        >
-          <SpeakerIcon />
-          Speak
-        </button>
+         {isSpeaking ? (
+          <button
+            onClick={onStopSpeaking}
+            className="px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors bg-amber-600 hover:bg-amber-700 text-white"
+          >
+            <StopIcon />
+            Stop Speaking
+          </button>
+         ) : (
+          <button
+            onClick={onSpeak}
+            disabled={!hasReview || isReviewing}
+            className="px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-shark hover:bg-storm-gray/20 border border-storm-gray/50"
+          >
+            <SpeakerIcon />
+            Speak
+          </button>
+         )}
         <button
           onClick={onUndo}
           disabled={!canUndo || isReviewing}
@@ -100,6 +114,12 @@ const ReviewIcon: React.FC = () => (
 const SpeakerIcon: React.FC = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path d="M6 8a2 2 0 012-2h1.586l1.707-1.707A1 1 0 0113 5.414v9.172a1 1 0 01-1.707.707L9.586 14H8a2 2 0 01-2-2H3a1 1 0 01-1-1V9a1 1 0 011-1h3zm6 0a1 1 0 11-2 0 1 1 0 012 0zm3.5 4.5a1 1 0 10-2 0v-5a1 1 0 102 0v5z" />
+    </svg>
+);
+
+const StopIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V3z" clipRule="evenodd" />
     </svg>
 );
 
