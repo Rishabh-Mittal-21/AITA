@@ -1,4 +1,4 @@
-const ELEVENLABS_API_KEY = "NOTHINGWHATSOEVER";
+// const ELEVENLABS_API_KEY = "NOTHINGWHATSOEVER";
 
 export const getElevenLabsAudio = async (text: string, voiceId: string): Promise<ArrayBuffer> => {
     
@@ -8,7 +8,7 @@ export const getElevenLabsAudio = async (text: string, voiceId: string): Promise
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'xi-api-key': "NOTHINGWHATSOEVER",
+            'xi-api-key': process.env.ELEVENLABS_API_KEY,
         },
         body: JSON.stringify({
             text: text,
