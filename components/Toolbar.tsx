@@ -41,7 +41,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
       <div className="flex items-center justify-between py-2 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-bold text-white">
-            Code<span className="text-science-blue">Whisperer</span>
+            Git<span className="text-science-blue">Good</span>
           </h1>
         </div>
         <div className="flex items-center gap-2">

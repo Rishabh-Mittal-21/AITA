@@ -104,6 +104,8 @@ const App: React.FC = () => {
     };
   }, [handleReview, isLoading]);
 
+  
+
   const handleHighlightLines = (start: number, end?: number) => {
     setHighlightedLines({ start, end: end || start });
   };
@@ -277,7 +279,7 @@ const App: React.FC = () => {
         isSpeaking={isSpeaking}
         hasReview={!!codeReview && codeReview.feedback.some(f => f.status === 'active')}
       />
-  <main className="flex flex-1 overflow-hidden">
+      <main className="flex flex-1 overflow-hidden">
         <CodePanel
           code={code}
           onCodeChange={setCode}
