@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PERSONAS } from '../constants';
 import type { Persona } from '../types';
@@ -8,6 +7,9 @@ interface ToolbarProps {
   onPersonaChange: (persona: Persona) => void;
   onReview: () => void;
   onSpeak: () => void;
+  onUndo: () => void;
+  onStop: () => void;
+  canUndo: boolean;
   isReviewing: boolean;
   hasReview: boolean;
 }
@@ -17,6 +19,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onPersonaChange,
   onReview,
   onSpeak,
+  onUndo,
+  onStop,
+  canUndo,
   isReviewing,
   hasReview
 }) => {
@@ -53,16 +58,34 @@ const Toolbar: React.FC<ToolbarProps> = ({
           className="px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-shark hover:bg-storm-gray/20 border border-storm-gray/50"
         >
           <SpeakerIcon />
-          Speak Feedback
+          Speak
         </button>
         <button
-          onClick={onReview}
-          disabled={isReviewing}
-          className="px-4 py-2 text-sm font-semibold text-white rounded-md flex items-center gap-2 transition-colors bg-science-blue hover:bg-blue-700 disabled:bg-blue-900 disabled:text-gray-400 disabled:cursor-wait"
+          onClick={onUndo}
+          disabled={!canUndo || isReviewing}
+          className="px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-shark hover:bg-storm-gray/20 border border-storm-gray/50"
         >
-          {isReviewing ? <SpinnerIcon /> : <ReviewIcon />}
-          {isReviewing ? 'Analyzing...' : 'Review Code (Alt+R)'}
+          <UndoIcon />
+          Undo
         </button>
+        {isReviewing ? (
+           <button
+            onClick={onStop}
+            className="px-4 py-2 text-sm font-semibold text-white rounded-md flex items-center gap-2 transition-colors bg-red-600 hover:bg-red-700"
+          >
+            <SpinnerIcon />
+            Stop
+          </button>
+        ) : (
+          <button
+            onClick={onReview}
+            disabled={isReviewing}
+            className="px-4 py-2 text-sm font-semibold text-white rounded-md flex items-center gap-2 transition-colors bg-science-blue hover:bg-blue-700 disabled:bg-blue-900 disabled:text-gray-400 disabled:cursor-wait"
+          >
+            <ReviewIcon />
+            Review Code
+          </button>
+        )}
       </div>
     </div>
   );
@@ -79,6 +102,13 @@ const SpeakerIcon: React.FC = () => (
         <path d="M6 8a2 2 0 012-2h1.586l1.707-1.707A1 1 0 0113 5.414v9.172a1 1 0 01-1.707.707L9.586 14H8a2 2 0 01-2-2H3a1 1 0 01-1-1V9a1 1 0 011-1h3zm6 0a1 1 0 11-2 0 1 1 0 012 0zm3.5 4.5a1 1 0 10-2 0v-5a1 1 0 102 0v5z" />
     </svg>
 );
+
+const UndoIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM5.293 8.293a1 1 0 011.414 0L9 10.586V7a1 1 0 112 0v3.586l2.293-2.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+    </svg>
+);
+
 
 const SpinnerIcon: React.FC = () => (
     <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
